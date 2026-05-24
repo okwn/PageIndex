@@ -141,6 +141,81 @@ You can generate the PageIndex tree structure with this open-source repo; or use
 
 ---
 
+# 🏛️ Architecture Overview
+
+PageIndex follows a **two-stage retrieval architecture** that separates indexing from retrieval, enabling reasoning-based document search without vector databases.
+
+## System Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           DOCUMENT INPUT                                │
+│                     (PDF or Markdown files)                              │
+└─────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        STAGE 1: INDEXING                                │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────────────┐    │
+│  │   Parser    │───▶│  Tree       │───▶│  Hierarchical Tree       │    │
+│  │             │    │  Builder    │    │  Structure Index        │    │
+│  └─────────────┘    └─────────────┘    └─────────────────────────┘    │
+│                                                                         │
+│  • PDF parsing / Markdown parsing                                        │
+│  • Section detection via TOC or heading hierarchy                        │
+│  • LLM-generated summaries at each node                                  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         STAGE 2: RETRIEVAL                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────────────┐     │
+│  │   Query     │───▶│  Reasoning  │───▶│  Relevant Document      │     │
+│  │   (RAG)     │    │  Engine     │    │  Sections               │     │
+│  └─────────────┘    └─────────────┘    └─────────────────────────┘     │
+│                                                                         │
+│  • LLM traverses tree structure to find relevant sections               │
+│  • Context-aware reasoning (includes conversation history)              │
+│  • Returns page/section references with explanations                    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## Key Components
+
+| Component | Description |
+|-----------|-------------|
+| **Parser** | Extracts text and structure from PDFs or Markdown documents |
+| **Tree Builder** | Uses LLM to generate hierarchical tree structure with summaries |
+| **Tree Structure** | JSON-based index representing document hierarchy with node metadata |
+| **Reasoning Engine** | LLM-driven tree traversal to locate relevant sections for a query |
+
+## Indexing Flow
+
+1. **Document Input** → Raw PDF or Markdown document
+2. **Structure Extraction** → Detect TOC, sections, headings, page boundaries
+3. **Tree Construction** → LLM generates hierarchical index with:
+   - Node titles and IDs
+   - Page ranges (`start_index`, `end_index`)
+   - AI-generated summaries for each node
+4. **Persistent Index** → Tree stored as JSON for fast retrieval
+
+## Retrieval Flow
+
+1. **Query Input** → User question or search request
+2. **Context Assembly** → Query + conversation history + domain context
+3. **Tree Traversal** → LLM navigates the tree structure, reasoning at each node
+4. **Relevance Scoring** → Node-by-node evaluation guided by LLM reasoning
+5. **Result Extraction** → Returns relevant sections with page references
+
+## Design Principles
+
+- **No Vectors**: Retrieval is based on structural reasoning, not semantic similarity
+- **No Chunking**: Documents retain natural section hierarchy
+- **Explainable**: Every retrieval decision is traceable through tree traversal
+- **Context-Aware**: Full conversation and domain context incorporated per query
+
+---
+
 # ⚙️ Package Usage
 
 > **Note:** This package uses standard PDF parsing. For use cases with complex PDFs, our [cloud service](https://pageindex.ai/developer) (via MCP and API) offers enhanced OCR, tree building, and retrieval.
