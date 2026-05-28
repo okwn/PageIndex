@@ -297,3 +297,10 @@ PageIndex Blog, Sep 2025.
 
 ## Contributing
 PRs welcome!
+## Installation
+
+1. Copy the `manifest.json`, `main.js`, and `styles.css` files to your Obsidian vault's plugins folder:
+   `<vault>/.obsidian/plugins/pageindex/`
+2. Enable the plugin in Obsidian Settings > Community Plugins.
+
+Or use the Obsidian Plugin Manager.
