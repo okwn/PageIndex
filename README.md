@@ -294,3 +294,5 @@ PageIndex Blog, Sep 2025.
 ---
 
 © 2026 [Vectify AI](https://vectify.ai)
+
+- Documentation updated for clarity
