@@ -297,3 +297,6 @@ PageIndex Blog, Sep 2025.
 
 ## Contributing
 PRs welcome!
+
+<!-- Contributor: Arvuno - documentation update -->
+
